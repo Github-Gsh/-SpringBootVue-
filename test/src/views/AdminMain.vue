@@ -14,7 +14,7 @@
         <!-- 侧边栏菜单 -->
         <el-aside width="200px">
           <el-menu :default-active="activeMenu" class="el-menu-vertical-demo" router>
-            <el-menu-item index="/dashboard">仪表盘</el-menu-item>
+            <el-menu-item index="/adminMain/userlist">用户列表</el-menu-item>
             <el-menu-item index="/profile">个人中心</el-menu-item>
             <el-menu-item index="/settings">设置</el-menu-item>
           </el-menu>
@@ -22,7 +22,7 @@
 
         <!-- 主内容区域 -->
         <el-main>
-          <p>这里是主内容区域，可以根据路由展示不同内容。</p>
+         <router-view />
         </el-main>
       </el-container>
     </el-container>
