@@ -17,8 +17,7 @@ public class AuthController {
 
     @Autowired
     private UserRepository userRepository;
-
-    // 用户登录接口
+//用户登录接口
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> loginData, HttpSession session) {
         String username = loginData.get("username");
@@ -28,11 +27,15 @@ public class AuthController {
         if (user != null && user.getPassword().equals(password)) {  // 直接对比明文密码
             // 将用户信息存入 session
             session.setAttribute("user", user);
-            return ResponseEntity.ok("Login successful");
+
+            // 返回用户角色信息，以便前端进行页面跳转
+            return ResponseEntity.ok(Map.of("message", "Login successful", "role", user.getRole()));
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
         }
     }
+
+
 
     // 用户注册接口
     @PostMapping("/register")

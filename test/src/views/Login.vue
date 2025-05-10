@@ -1,4 +1,4 @@
-<template>
+<template> 
   <div class="login-container">
     <h2>用户登录</h2>
     <form @submit.prevent="handleLogin">
@@ -26,22 +26,32 @@ const error = ref('')
 const loading = ref(false)
 const router = useRouter()
 
+
 const handleLogin = async () => {
-  loading.value = true
-  error.value = ''
+  loading.value = true;
+  error.value = '';
   try {
-    await axios.post(
+    const response = await axios.post(
       'http://localhost:8080/api/login',
       { username: username.value, password: password.value },
       { withCredentials: true }
-    )
-    router.push('/adminMain') // 登录成功后跳转页面
+    );
+    
+    const role = Number(response.data.role);  // 将角色信息转换为数字类型
+
+    // 根据角色值跳转
+    if (role === 0) {
+      router.push('/adminMain');  // 管理员页面
+    } else if (role === 1) {
+      router.push('/userMain');   // 普通用户页面
+    }
   } catch (err) {
-    error.value = err.response?.data || '登录失败'
+    error.value = err.response?.data || '登录失败';
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
+
 </script>
 
 <style scoped>
