@@ -1,6 +1,8 @@
 package com.study1.Controller;
 
+import com.study1.Repository.ProfileRepository;
 import com.study1.Repository.UserRepository;
+import com.study1.entity.Profile;
 import com.study1.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,7 +19,10 @@ public class AuthController {
 
     @Autowired
     private UserRepository userRepository;
-//用户登录接口
+    @Autowired
+    private ProfileRepository profileRepository;
+
+    //用户登录接口
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> loginData, HttpSession session) {
         String username = loginData.get("username");
@@ -48,14 +53,21 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username already exists");
         }
 
-        // 创建新用户并保存
+        // 创建新用户对象并保存
         User newUser = new User();
         newUser.setUsername(username);
-        newUser.setPassword(password);  // 明文存储密码
+        newUser.setPassword(password);  // 明文密码（建议使用加密）
 
         userRepository.save(newUser);
+
+        // 创建用户信息 Profile，并将用户名写入 name 字段
+        Profile profile = new Profile();
+        profile.setName(username);   // 设置 name 为注册的用户名
+        profileRepository.save(profile);  // 保存到 user_information 表
+
         return ResponseEntity.ok("User registered successfully");
     }
+
 
     // 检查当前登录用户
     @GetMapping("/me")

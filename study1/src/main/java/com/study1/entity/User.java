@@ -1,9 +1,11 @@
 package com.study1.entity;
 
 import lombok.Data;
+import org.hibernate.annotations.DynamicInsert;
 
 import javax.persistence.*;
 
+@DynamicInsert
 @Entity
 @Table(name = "users")
 @Data

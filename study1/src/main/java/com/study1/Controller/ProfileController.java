@@ -16,7 +16,7 @@ public class ProfileController {
 
     @Autowired
     private ProfileRepository profileRepository;
-
+//查找信息
     @GetMapping
     public ResponseEntity<?> getProfile(HttpSession session) {
         User user = (User) session.getAttribute("user");
@@ -32,4 +32,25 @@ public class ProfileController {
             return ResponseEntity.status(401).body("Not logged in");
         }
     }
+
+    //更新用户信息
+    @PostMapping("/update")
+    public ResponseEntity<?> updateProfile(@RequestBody Profile updatedProfile, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) return ResponseEntity.status(401).body("未登录");
+
+        Profile profile = profileRepository.findByName(user.getUsername());
+        if (profile == null) return ResponseEntity.status(404).body("未找到信息");
+
+        // 更新字段
+        profile.setAge(updatedProfile.getAge());
+        profile.setSex(updatedProfile.getSex());
+        profile.setPhone(updatedProfile.getPhone());
+        profile.setAddress(updatedProfile.getAddress());
+        profile.setEmail(updatedProfile.getEmail());
+
+        profileRepository.save(profile);
+        return ResponseEntity.ok("修改成功");
+    }
+
 }
