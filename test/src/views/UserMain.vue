@@ -15,6 +15,7 @@
         <el-aside width="200px">
           <el-menu :default-active="activeMenu" class="el-menu-vertical-demo" router>
             <el-menu-item index="/userMain/profile">个人中心</el-menu-item>
+            <el-menu-item index="/userMain/project">项目管理</el-menu-item>
             <el-menu-item index="/settings">设置</el-menu-item>
           </el-menu>
         </el-aside>
