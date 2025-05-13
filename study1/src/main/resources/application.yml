@@ -4,11 +4,12 @@ spring:
     username: root
     password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver
+
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
-#??????
+
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
 
@@ -16,3 +17,14 @@ spring:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
+
+  web:
+    resources:
+      static-locations: file:D:/Git_project/springboot_vue/study1/uploads/
+
+  mvc:
+    static-path-pattern: /avatar/**
+
+upload:
+  avatar-path: D:/Git_project/springboot_vue/study1/uploads/
+  avatar-url-prefix: http://localhost:8080/avatar/
