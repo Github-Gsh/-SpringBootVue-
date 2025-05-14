@@ -18,8 +18,19 @@ public class Project {
 
     private String filePath;
 
-    // --- Getter & Setter ---
+    private String status = "待审批";
 
+
+
+
+    // --- Getter & Setter ---
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
     public Long getPid() {
         return pid;
     }

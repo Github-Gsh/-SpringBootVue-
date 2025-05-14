@@ -24,20 +24,63 @@ public class ProjectController {
     @Autowired
     private ProjectRepository projectRepo;
 
-    // 获取当前登录用户名
+    // 获取当前登录用户对象
+    private User getCurrentUser(HttpSession session) {
+        return (User) session.getAttribute("user");
+    }
+
+    // 获取当前用户名
     private String getCurrentUsername(HttpSession session) {
-        User user = (User) session.getAttribute("user");
+        User user = getCurrentUser(session);
         return user != null ? user.getUsername() : null;
     }
 
-    // 获取当前用户的所有项目
+    // ✅ 获取当前用户项目（管理员返回所有项目）
     @GetMapping("/projects")
     public List<Project> getProjects(HttpSession session) {
-        String username = getCurrentUsername(session);
-        return projectRepo.findByName(username);
+        User user = getCurrentUser(session);
+
+        if (user == null) {
+            return Collections.emptyList();
+        }
+
+        if ("0".equals(user.getRole())) {
+            return projectRepo.findAll();
+        } else {
+            return projectRepo.findByName(user.getUsername());
+        }
     }
 
-    // 新建项目（带文件）
+    // ✅ 管理员获取全部项目（独立接口）
+    @GetMapping("/admin/projects")
+    public ResponseEntity<?> getAllProjectsForAdmin(HttpSession session) {
+        User user = getCurrentUser(session);
+        if (user == null || !"0".equals(user.getRole())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("无权限访问");
+        }
+        return ResponseEntity.ok(projectRepo.findAll());
+    }
+
+    // ✅ 管理员审批项目接口
+    @PutMapping("/admin/projects/{pid}/approve")
+    public ResponseEntity<?> approveProject(@PathVariable Long pid, HttpSession session) {
+        User user = getCurrentUser(session);
+        if (user == null || !"0".equals(user.getRole())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("无权限操作");
+        }
+
+        Optional<Project> optional = projectRepo.findById(pid);
+        if (optional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Project project = optional.get();
+        project.setStatus("已审批");
+        projectRepo.save(project);
+        return ResponseEntity.ok("项目已审批");
+    }
+
+    // ✅ 创建项目
     @PostMapping("/projects")
     public ResponseEntity<?> createProject(
             @RequestParam("title") String title,
@@ -53,6 +96,7 @@ public class ProjectController {
         project.setTitle(title);
         project.setDescription(description);
         project.setName(username);
+        project.setStatus("待审批"); // 默认状态
 
         if (file != null && !file.isEmpty()) {
             try {
@@ -68,7 +112,7 @@ public class ProjectController {
         return ResponseEntity.ok("项目创建成功");
     }
 
-    // 更新项目（可带新文件）
+    // ✅ 更新项目
     @PutMapping("/projects/{pid}")
     public ResponseEntity<?> updateProject(
             @PathVariable Long pid,
@@ -103,7 +147,7 @@ public class ProjectController {
         return ResponseEntity.ok("项目更新成功");
     }
 
-    // 删除项目
+    // ✅ 删除项目
     @DeleteMapping("/projects/{pid}")
     public ResponseEntity<?> deleteProject(@PathVariable Long pid, HttpSession session) {
         Optional<Project> optional = projectRepo.findById(pid);
@@ -119,18 +163,17 @@ public class ProjectController {
         return ResponseEntity.ok("删除成功");
     }
 
-    // 上传辅助函数
+    // ✅ 文件上传辅助函数
     private String saveFile(MultipartFile file) throws IOException {
-        Files.createDirectories(BASE_UPLOAD_DIR); // 确保目录存在
+        Files.createDirectories(BASE_UPLOAD_DIR);
         String filename = UUID.randomUUID() + "-" + StringUtils.cleanPath(file.getOriginalFilename());
         Path targetPath = BASE_UPLOAD_DIR.resolve(filename);
         file.transferTo(targetPath.toFile());
-
         System.out.println("✅ 文件已保存至：" + targetPath.toAbsolutePath());
         return filename;
     }
 
-    // 文件下载接口
+    // ✅ 文件下载接口
     @GetMapping("/files/{filename:.+}")
     public ResponseEntity<org.springframework.core.io.Resource> serveFile(@PathVariable String filename) {
         try {

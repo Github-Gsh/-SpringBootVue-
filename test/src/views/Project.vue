@@ -13,6 +13,7 @@
       <li v-for="project in projects" :key="project.pid" class="border p-4 rounded">
         <h3 class="text-lg font-semibold">{{ project.title }}</h3>
         <p>{{ project.description }}</p>
+        <p>{{ project.status }}</p>
         <div class="mt-2 flex space-x-2">
           <button @click="editProject(project)" class="text-blue-600">编辑</button>
           <button @click="deleteProject(project.pid)" class="text-red-600">删除</button>

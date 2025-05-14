@@ -7,6 +7,7 @@ import UserMain from '../views/UserMain.vue'
 import Profile from '../views/Profile.vue'
 import component from 'element-plus/es/components/tree-select/src/tree-select-option.mjs'
 import Project from '../views/Project.vue'
+import AdminProject from '../views/AdminProject.vue'
 
 const routes = [
   { path: '/', redirect: '/login' },
@@ -17,6 +18,7 @@ const routes = [
     component: AdminMain,
     children: [
       { path: 'userlist', component: UserList },
+      { path: 'adminProject', component: AdminProject }
       // 更多子页面也可以继续添加，比如:
       // { path: 'profile', component: Profile },
     ]
